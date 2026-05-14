@@ -2,12 +2,13 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { addItem } from './CartSlice';
 import './ProductList.css';
+import CartItem from './CartItem';
 
-const ProductList = () => {
+const ProductList = ({ onHomeClick, totalItems }) => {
     const dispatch = useDispatch();
+    const [showCart, setShowCart] = useState(false);
     const [addedToCart, setAddedToCart] = useState({});
 
-    // O array já vem no projeto – mantive os 3 grupos com 6 plantas
     const plantsArray = [
         {
             category: "Air Purifying Plants",
@@ -48,7 +49,7 @@ const ProductList = () => {
             plants: [
                 {
                     name: "Citronella",
-                    image: "https://cdn.pixabay.com/photo/2020/02/15/09/49/citronella-4850305_1280.jpg",
+                    image: "https://images.unsplash.com/photo-1599598177991-ec67b5c37318",
                     description: "Natural mosquito repellent.",
                     cost: "$14"
                 },
@@ -67,30 +68,54 @@ const ProductList = () => {
         setAddedToCart((prev) => ({ ...prev, [plant.name]: true }));
     };
 
+    const handleCartClick = () => setShowCart(true);
+    const handleContinueShopping = () => setShowCart(false);
+
     return (
-        <div className="product-list">
-            {plantsArray.map((category, idx) => (
-                <div key={idx}>
-                    <h2 className="plant-category">{category.category}</h2>
-                    <div className="product-grid">
-                        {category.plants.map((plant, i) => (
-                            <div className="product-card" key={i}>
-                                <img className="product-image" src={plant.image} alt={plant.name} />
-                                <h3>{plant.name}</h3>
-                                <p>{plant.description}</p>
-                                <p className="product-price">{plant.cost}</p>
-                                <button
-                                    className={`product-button ${addedToCart[plant.name] ? 'added' : ''}`}
-                                    onClick={() => handleAddToCart(plant)}
-                                    disabled={addedToCart[plant.name]}
-                                >
-                                    {addedToCart[plant.name] ? "Added to Cart" : "Add to Cart"}
-                                </button>
-                            </div>
-                        ))}
+        <div>
+            {/* HEADER – aparece nas duas páginas */}
+            <div className="navbar">
+                <div className="navbar-brand" onClick={onHomeClick}>Paradise Nursery</div>
+                <div className="navbar-links">
+                    <span onClick={onHomeClick}>Home</span>
+                    <span onClick={() => setShowCart(false)}>Plants</span>
+                    <div className="cart-icon" onClick={handleCartClick}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="white" viewBox="0 0 24 24">
+                          <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2zM7.16 14h9.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49a1 0 0 0-.88-1.48H5.21L4.27 2H1v2h2l3.6 7.59-1.35 2.44C4.52 14.37 5.48 16 7 16h12v-2H7.42c-.14 0-.25-.11-.25-.25l.01-.03z"/>
+                        </svg>
+                        <span className="cart-count">{totalItems}</span>
                     </div>
                 </div>
-            ))}
+            </div>
+
+            {!showCart ? (
+                <div className="product-list">
+                    {plantsArray.map((category, idx) => (
+                        <div key={idx}>
+                            <h2 className="plant-category">{category.category}</h2>
+                            <div className="product-grid">
+                                {category.plants.map((plant, i) => (
+                                    <div className="product-card" key={i}>
+                                        <img className="product-image" src={plant.image} alt={plant.name} />
+                                        <h3>{plant.name}</h3>
+                                        <p>{plant.description}</p>
+                                        <p className="product-price">{plant.cost}</p>
+                                        <button
+                                            className={`product-button ${addedToCart[plant.name] ? 'added' : ''}`}
+                                            onClick={() => handleAddToCart(plant)}
+                                            disabled={addedToCart[plant.name]}
+                                        >
+                                            {addedToCart[plant.name] ? "Added to Cart" : "Add to Cart"}
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <CartItem onContinueShopping={handleContinueShopping} />
+            )}
         </div>
     );
 };
